@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,57 +28,121 @@ import com.getpebble.android.kit.util.PebbleDictionary;
 
 public class MainActivity extends Activity {
 	
-	private static final UUID WATCHAPP_UUID = UUID.fromString("6092637b-8f58-4199-94d8-c606b1e45040");
-	private static final String WATCHAPP_FILENAME = "android-example.pbw";
+
 	
-	private static final int
-		KEY_BUTTON = 0,
-		KEY_VIBRATE = 1,
-		BUTTON_UP = 0,
-		BUTTON_SELECT = 1,
-		BUTTON_DOWN = 2;
+
 	
 	private Handler handler = new Handler();
 	private PebbleDataReceiver appMessageReciever;
-	private TextView whichButtonView;
+	private Match match;
+    private RelativeLayout matchLayout;
+    private View decorView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        decorView = getWindow().getDecorView();
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+
+        decorView.setSystemUiVisibility(uiOptions);
+        // Remember that you should never show the action bar if the
+        // status bar is hidden, so hide that too if necessary.
+        ActionBar actionBar = getActionBar();
+        actionBar.hide();
 		setContentView(R.layout.activity_main);
-		
-		// Customize ActionBar
-		ActionBar actionBar = getActionBar();
-		actionBar.setTitle("Wrestling Watch");
-		actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.actionbar_orange)));
-		
+
 
 		
-		// Add vibrate Button behavior
-		Button vibrateButton = (Button)findViewById(R.id.button_vibrate);
-		vibrateButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// Send KEY_VIBRATE to Pebble
-				PebbleDictionary out = new PebbleDictionary();
-				out.addInt32(KEY_VIBRATE, 0);
-				PebbleKit.sendDataToPebble(getApplicationContext(), WATCHAPP_UUID, out);
-			}
-			
-		});
-		
-		// Add output TextView behavior
-		whichButtonView = (TextView)findViewById(R.id.which_button);
+
+		matchLayout = (RelativeLayout) findViewById(R.id.match_layout);
+        match = new Match(this, matchLayout, "Adam", "Michael");
+
+
+
+        setupButtons();
+
+
 	}
-	
+
+
+    public void setupButtons() {
+
+        //player 1
+        Button player1_t = (Button) findViewById(R.id.player1_t);
+        player1_t.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                match.player1Point(new Takedown(match.getPeriod()));
+            }
+        });
+
+        Button player1_nf = (Button) findViewById(R.id.player1_nf);
+        player1_nf.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                match.player1Point(new NearFall(match.getPeriod()));
+            }
+        });
+
+        Button player1_e = (Button) findViewById(R.id.player1_e);
+        player1_e.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                match.player1Point(new Escape(match.getPeriod()));
+            }
+        });
+
+        Button player1_r = (Button) findViewById(R.id.player1_r);
+        player1_r.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                match.player1Point(new Reversal(match.getPeriod()));
+            }
+        });
+
+        //player2
+        Button player2_t = (Button) findViewById(R.id.player2_t);
+        player2_t.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                match.player2Point(new Takedown(match.getPeriod()));
+            }
+        });
+
+        Button player2_nf = (Button) findViewById(R.id.player2_nf);
+        player2_nf.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                match.player2Point(new NearFall(match.getPeriod()));
+            }
+        });
+
+        Button player2_e = (Button) findViewById(R.id.player2_e);
+        player2_e.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                match.player2Point(new Escape(match.getPeriod()));
+            }
+        });
+
+        Button player2_r = (Button) findViewById(R.id.player2_r);
+        player2_r.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                match.player2Point(new Reversal(match.getPeriod()));
+            }
+        });
+
+    }
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		
 		// Define AppMessage behavior
 		if(appMessageReciever == null) {
-			appMessageReciever = new PebbleDataReceiver(WATCHAPP_UUID) {
+			appMessageReciever = new PebbleDataReceiver(PebbleInfo.WATCHAPP_UUID) {
 				
 				@Override
 				public void receiveData(Context context, int transactionId, PebbleDictionary data) {
@@ -85,9 +150,9 @@ public class MainActivity extends Activity {
 					PebbleKit.sendAckToPebble(context, transactionId);
 					
 					// What message was received?
-					if(data.getInteger(KEY_BUTTON) != null) {
+					if(data.getInteger(PebbleInfo.KEY_BUTTON) != null) {
 						// KEY_BUTTON was received, determine which button
-						final int button = data.getInteger(KEY_BUTTON).intValue();
+						final int button = data.getInteger(PebbleInfo.KEY_BUTTON).intValue();
 						
 						// Update UI on correct thread
 						handler.post(new Runnable() {
@@ -95,14 +160,19 @@ public class MainActivity extends Activity {
 							@Override
 							public void run() {
 								switch(button) {
-								case BUTTON_UP:
-									whichButtonView.setText("UP");
+								case PebbleInfo.BUTTON_UP:
+									//whichButtonView.setText("UP");
 									break;
-								case BUTTON_SELECT:
-									whichButtonView.setText("SELECT");
+								case PebbleInfo.BUTTON_SELECT:
+									if(match.isPaused()) {
+                                       match.startMatch();
+                                    }
+                                    else {
+                                        match.pauseMatch();
+                                    }
 									break;
-								case BUTTON_DOWN:
-									whichButtonView.setText("DOWN");
+								case PebbleInfo.BUTTON_DOWN:
+									//whichButtonView.setText("DOWN");
 									break;
 								default:
 									Toast.makeText(getApplicationContext(), "Unknown button: " + button, Toast.LENGTH_SHORT).show();
