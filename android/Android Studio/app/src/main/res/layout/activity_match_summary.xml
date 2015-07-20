@@ -1,0 +1,101 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.getpebble.WrestlingWatch.MatchSummary">
+
+    <TextView android:text="Match Summary" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:id="@+id/match_summary"
+        android:layout_centerHorizontal="true"/>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/details"
+        android:layout_below="@id/match_summary"
+        android:orientation="horizontal">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Referee: "
+        android:textSize="25dp"
+        android:id="@+id/ref"
+        android:layout_alignParentLeft="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Weight Class: "
+            android:textSize="25dp"
+            android:id="@+id/wc"
+            android:layout_centerInParent="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Periods: "
+            android:textSize="25dp"
+            android:id="@+id/periods"
+            android:paddingRight="50dp"
+            android:layout_alignParentRight="true"/>
+
+        </RelativeLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/details"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Adam: 47"
+                android:layout_centerHorizontal="true"
+                android:textSize="50dp"
+                android:id="@+id/player1_final"
+                android:textColor="#00FF00"/>
+            <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/player1_final"
+                android:id="@+id/player1_points">
+                </ScrollView>
+
+            </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kyle: 47"
+                android:textSize="50dp"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/player2_final"
+                android:textColor="#FF0000"/>
+            <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/player2_final"
+                android:id="@+id/player2_points">
+            </ScrollView>
+        </RelativeLayout>
+
+
+
+
+        </LinearLayout>
+
+
+</RelativeLayout>
